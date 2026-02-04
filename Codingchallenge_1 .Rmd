@@ -66,68 +66,68 @@ Vectors are 1-D with one data type, matrices are 2-D with one data type, while d
 
 o	Create a vector named 'z' with the values 1 to 200
 ```{r}
-z <- 1:200
+z <- 1:200 #creating vector
 ```
 
 o	Print the mean and standard deviation of z on the console
 ```{r}
-mean(z)
-sd(z)
+mean(z) #calculate mean
+sd(z)  #calculate standard deviation
 ```
 
 o	Create a logical vector named zlog that is 'TRUE' for z values greater than 30 and 'FALSE' otherwise.
 ```{r}
-zlog <- z > 30
+zlog <- z > 30 #creating logical vector
 zlog
 ```
 
 o	Make a dataframe with z and zlog as columns. Name the dataframe zdf
 ```{r}
-zdf <- data.frame(z,zlog)
+zdf <- data.frame(z,zlog) #creating a data frame
 zdf
 ```
 
 o	Change the column names in your new dataframe to equal “zvec” and “zlogic”
 
 ```{r}
-colnames(zdf) <- c("zvec", "zlogic")
+colnames(zdf) <- c("zvec", "zlogic") #changing the names of column name within a dataframe
 colnames(zdf)
 ```
 
 o	Make a new column in your dataframe equal to zvec squared (i.e., z2). Call the new column zsquared. 
 
 ```{r}
-zdf$z2 <- (zdf$zvec)^2
+zdf$z2 <- (zdf$zvec)^2 #making a new column in the dataframe
 zdf
 ```
 
 o	Subset the dataframe with and without the subset() function to only include values of zsquared greater than 10 and less than 100 
 ```{r}
-subset(zdf, (z2 > 10) & (z2 < 100) )
+subset(zdf, (z2 > 10) & (z2 < 100) ) #subsetting using subset function
 ```
 
 ```{r}
-zdf$z2[((zdf$z2 > 10) & (zdf$z2 <  100))]
+zdf$z2[((zdf$z2 > 10) & (zdf$z2 <  100))] #subsetting without using subset function
 ```
 
 o	Subset the zdf dataframe to only include the values on row 26
 ```{r}
-zdf[26,]
+zdf[26,] #subsetting to only include a particular row
 ```
 
 o	Subset the zdf dataframe to only include the values in the column zsquared in the 180th row.
 ```{r}
-zdf$z2[180]
+zdf$z2[180] #subsetting to include only a value in a row within a column
 ```
 
 5.	3 pts. Download the Tips.csv file from Canvas. Use the read.csv() function to read the data into R using a relative file path  and so that the missing values are properly coded. **Note the missing values are reported in the data as a period (i.e., “.”). How do you know the data were read correctly? 
 
 ```{r}
-Tips = read.csv("TipsR.csv", na.strings = ".")
+Tips = read.csv("TipsR.csv", na.strings = ".") #read csv file
 ```
 
 6.	2 pts. Annotate your code, commit the changes and push it to your GitHub repository you created last class
 
-I saved it.
+I annnotated and saved it.
 
 
