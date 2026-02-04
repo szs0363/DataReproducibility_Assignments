@@ -128,6 +128,6 @@ Tips = read.csv("TipsR.csv", na.strings = ".") #read csv file
 
 6.	2 pts. Annotate your code, commit the changes and push it to your GitHub repository you created last class
 
-I annnotated and saved it.
+I annnotated the code and saved it.
 
 
