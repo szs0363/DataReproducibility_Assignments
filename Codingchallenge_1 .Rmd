@@ -1,0 +1,133 @@
+---
+title: "Coding Challenge 1"
+author: "Somraj Shrestha"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+tinytex::install_tinytex()
+This assignment is intended to introduce you to R, RStudio, and integration with GitHub, as well as help you practice some R coding. You may work in pairs. When submitting the assignment on Canvas, please put both names on the assignment. 
+
+1.	5 pts. Explain the following things about R and Rstudio: 
+o	Where do you type code? 
+- Source
+
+o	Where is the output of the code? 
+- Console
+
+o	Where do plots show up? 
+- Plots tab in bottom right pane.
+
+o	What is a global environment? 
+- Current R workspace where all created objects are stored.
+
+
+o	How do you get help for a function through R studio?
+- Help tab on bottom right pane.
+
+o	What is an R package?
+- a collection of functions, datasets, and documentation that extends R’s capabilities beyond base R.
+
+o	What is a function? 
+- a reusable piece of code that takes input, performs an operation, and returns output.
+
+o	How do you find the installed and loaded packages? 
+- By checking on packages tab on bottom right pane and the ones that are ticked off are the installed and loaded packages.
+
+o	What is a working directory, and how do you find it? 
+- the default folder where R reads files from and saves files to.
+We can find it with function #getwd().
+
+o	What is a relative file path and how is it different than an absolute file path? 
+- A relative path is a path relative to our working directory whereas, an absolute path is a path from root of our computer.
+
+2.	2 pts. Explain the steps to start a new R project connected to a GitHub repository.
+a. Go to GitHub → copy the repository URL.
+b. Open RStudio.
+c. Click File → New Project → Version Control → Git.
+d. Paste the Repository URL.
+e. Create a local folder for the project.
+f. Click Create Project.
+g. RStudio opens the project and connects it to GitHub.
+
+3.	3 pts. Please explain the different data classes and how they are similar and different from each other. 
+o	Vector - A one-dimensional collection of elements.
+o	Dataframe - A table-like structure (like a spreadsheet).
+o	Matrix - A two-dimensional rectangular structure (rows × columns).
+
+Similarity:
+All three are core R data structures that store values and can be indexed and manipulated in the same session.
+Difference:
+Vectors are 1-D with one data type, matrices are 2-D with one data type, while data frames are 2-D but can contain multiple data types.
+
+4.	10 pts. Complete all tasks in an R script and push it to GitHub.
+
+o	Create a vector named 'z' with the values 1 to 200
+```{r}
+z <- 1:200
+```
+
+o	Print the mean and standard deviation of z on the console
+```{r}
+mean(z)
+sd(z)
+```
+
+o	Create a logical vector named zlog that is 'TRUE' for z values greater than 30 and 'FALSE' otherwise.
+```{r}
+zlog <- z > 30
+zlog
+```
+
+o	Make a dataframe with z and zlog as columns. Name the dataframe zdf
+```{r}
+zdf <- data.frame(z,zlog)
+zdf
+```
+
+o	Change the column names in your new dataframe to equal “zvec” and “zlogic”
+
+```{r}
+colnames(zdf) <- c("zvec", "zlogic")
+colnames(zdf)
+```
+
+o	Make a new column in your dataframe equal to zvec squared (i.e., z2). Call the new column zsquared. 
+
+```{r}
+zdf$z2 <- (zdf$zvec)^2
+zdf
+```
+
+o	Subset the dataframe with and without the subset() function to only include values of zsquared greater than 10 and less than 100 
+```{r}
+subset(zdf, (z2 > 10) & (z2 < 100) )
+```
+
+```{r}
+zdf$z2[((zdf$z2 > 10) & (zdf$z2 <  100))]
+```
+
+o	Subset the zdf dataframe to only include the values on row 26
+```{r}
+zdf[26,]
+```
+
+o	Subset the zdf dataframe to only include the values in the column zsquared in the 180th row.
+```{r}
+zdf$z2[180]
+```
+
+5.	3 pts. Download the Tips.csv file from Canvas. Use the read.csv() function to read the data into R using a relative file path  and so that the missing values are properly coded. **Note the missing values are reported in the data as a period (i.e., “.”). How do you know the data were read correctly? 
+
+```{r}
+Tips = read.csv("TipsR.csv", na.strings = ".")
+```
+
+6.	2 pts. Annotate your code, commit the changes and push it to your GitHub repository you created last class
+
+I saved it.
+
+
