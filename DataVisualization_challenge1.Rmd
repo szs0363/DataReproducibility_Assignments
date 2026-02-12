@@ -1,0 +1,117 @@
+---
+title: "DataVisualization_Challenge1"
+author: "Somraj Shrestha"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+1.	5 pts. Explain the following concepts about ggplot.
+
+a. What three elements do you need to produce a ggplot?
+- dataframe (data), aesthetic mapping (x and y variables, shape, color etc.), and a geom (the type of plot).
+
+b.	What is a geom? 
+- It is a geometric object which determines how the data are drawn on the plot.
+
+c.	What is a facet? 
+- It helps spliting the plots into small panels based on categorical variable thus, allowing us to compare between the groups within a dataframe.
+
+d.	Explain the concept of layering.
+- Layering means building a plot layer by layer by adding components that we need for the plot using +. Each layer adds information to the plot.
+
+e.	Where do you add x and y variables and map different shapes, colors, and other attributes to the data? 
+- We add x and y variables and different shapes, colors, and attributes inside aes() in the ggplot(). Or we can add them inside a specific geom too.
+
+2.	4 pts. Make a boxplot using ggplot with DON as the y variable, treatment as the x variable, and color mapped to the wheat cultivar. Change the y label to “DON (ppm)” and make the x label blank.
+
+```{r}
+myco_data <- read.csv("Data/MycotoxinData.csv", na.strings = "na") #load the data
+str(myco_data)
+```
+```{r}
+myco_data$Treatment <- as.factor(myco_data$Treatment)
+myco_data$Cultivar <- as.factor(myco_data$Cultivar)
+str(myco_data)
+```
+
+
+```{r}
+library(ggplot2)
+plot1 <- ggplot(myco_data, aes(x = Treatment,  y = DON, colour = Cultivar)) + 
+  geom_boxplot() +       #making a boxplot
+  xlab("") +             #labelling X-axis
+  ylab("DON(ppm)")       #labelling Y-axis
+plot1
+```
+
+3.	4 pts. Now convert this data into a bar chart with standard-error error bars using the stat_summary() command. (hint: use position = dodge)
+
+```{r}
+plot2 <- ggplot(myco_data, aes(x = Treatment,  y = DON, colour = Cultivar)) + 
+   stat_summary(fun = mean, geom = "bar", position = "dodge") +  #genrating barchart with mean
+  stat_summary(fun.data = mean_se, geom = "errorbar", position = "dodge")  #adding standard error bars on the bars
+plot2
+```
+4.	3 pts. Add points to the foreground of the boxplot and bar chart you made in questions 2 & 3 that show the distribution of points. Set the shape = 21 and the outline color black (hint: use jitter_dodge). 
+
+```{r}
+plot3 <- ggplot(myco_data, aes(x = Treatment,  y = DON, colour = Cultivar)) + 
+  geom_boxplot() +
+  geom_point(position = position_jitterdodge(), shape = 21, color = "black") + #adding points on the box-plot to visualize the data better
+  xlab("") +
+  ylab("DON(ppm)")
+plot3
+```
+
+```{r}
+plot4 <- ggplot(myco_data, aes(x = Treatment,  y = DON, colour = Cultivar)) +
+   stat_summary(fun = mean, geom = "bar", position = "dodge") +
+  stat_summary(fun.data = mean_se, geom = "errorbar", position = "dodge") +
+   geom_point(position = position_jitterdodge(), shape = 21, color = "black")
+plot4
+```
+
+5.	2 pts. Add a facet to the plots based on cultivar.
+
+```{r}
+plot5 <- ggplot(myco_data, aes(x = Treatment,  y = DON, colour = Cultivar)) + 
+  geom_boxplot() +
+  geom_point(position = position_jitterdodge(), shape = 21, color = "black") +
+  xlab("") +
+  ylab("DON(ppm)") +
+  facet_wrap(~Cultivar, scales = "free") #adding facet to divide the dataframe into sub-groups
+plot5
+```
+```{r}
+plot6 <- ggplot(myco_data, aes(x = Treatment,  y = DON, colour = Cultivar)) +
+   stat_summary(fun = mean, geom = "bar", position = "dodge") +
+  stat_summary(fun.data = mean_se, geom = "errorbar", position = "dodge") +
+   geom_point(position = position_jitterdodge(), shape = 21, color = "black") +
+  facet_wrap(~Cultivar, scales = "free")
+plot6
+```
+
+6.	3 pts. Add transparency to the points so you can still see the boxplot or bar in the background. 
+```{r}
+plot7 <- ggplot(myco_data, aes(x = Treatment,  y = DON, colour = Cultivar)) + 
+  geom_boxplot() +
+  geom_point(position = position_jitterdodge(), shape = 21, color = "black") + 
+  geom_jitter(width = 0.5, alpha = 0.5) + #adding transparency to the points
+xlab("") +
+  ylab("DON(ppm)") +
+  facet_wrap(~Cultivar, scales = "free")
+plot7
+```
+```{r}
+plot8 <- ggplot(myco_data, aes(x = Treatment,  y = DON, colour = Cultivar)) +
+   stat_summary(fun = mean, geom = "bar", position = "dodge") +
+  stat_summary(fun.data = mean_se, geom = "errorbar", position = "dodge") +
+   geom_point(position = position_jitterdodge(), shape = 21, color = "black") +
+   geom_jitter(width = 0.5, alpha = 0.5) + #adding transparency to the points
+  facet_wrap(~Cultivar, scales = "free")
+plot8
+```
+
+
+7.	4 pts. Annotate your code and push it to github. 
+Code annotated.
