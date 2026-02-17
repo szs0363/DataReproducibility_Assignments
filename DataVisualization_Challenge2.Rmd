@@ -1,0 +1,139 @@
+---
+title: "Advanced Data Visualization"
+author: "Somraj Shrestha"
+date: "`r Sys.Date()`"
+output: html_document
+---
+1. 
+```{r}
+cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+```
+
+```{r}
+myco_data <- read.csv("Data/MycotoxinData.csv", na.strings = "na")
+str(myco_data)
+```
+```{r}
+myco_data$Treatment <- as.factor(myco_data$Treatment)
+myco_data$Cultivar <- as.factor(myco_data$Cultivar)
+str(myco_data)
+```
+
+```{r}
+plot1 <- ggplot(myco_data, aes(x = Treatment, y = DON, fill = Cultivar)) +
+  geom_boxplot(position = position_dodge(), color = "black") +
+  geom_point(position = position_jitterdodge(), alpha = 0.6, color = "black", pch = 21) +
+  xlab("") +
+  ylab("DON(ppm)") +
+  facet_wrap(~Cultivar, scales = "free") + 
+  scale_fill_manual(values = c(cbbPalette[[3]], cbbPalette[[4]]), name = "", labels = c("Ambassador", "Wheaton")) +
+  theme_classic()
+
+plot1
+```
+2.
+```{r}
+myco_data$Treatment <- factor(myco_data$Treatment, labels = c("NTC", "Fg","Fg + 37", "Fg + 40", "Fg + 70"))
+
+plot2 <- ggplot(myco_data, aes(x = Treatment, y = DON, fill = Cultivar)) +
+  geom_boxplot(position = position_dodge(), color = "black") +
+  geom_point(position = position_jitterdodge(), alpha = 0.6, color = "black", pch = 21) +
+  xlab("") +
+  ylab("DON(ppm)") +
+  facet_wrap(~Cultivar, scales = "free") + 
+  scale_fill_manual(values = c(cbbPalette[[3]], cbbPalette[[4]]), name = "", labels = c("Ambassador", "Wheaton")) +
+  theme_classic()
+
+plot2
+```
+3.
+```{r}
+plot3 <- ggplot(myco_data, aes(x = Treatment, y = X15ADON, fill = Cultivar)) +
+  geom_boxplot(position = position_dodge(), color = "black") +
+  geom_point(position = position_jitterdodge(), alpha = 0.6, color = "black", pch = 21) +
+  xlab("") +
+  ylab("15ADON") +
+  facet_wrap(~Cultivar, scales = "free") + 
+  scale_fill_manual(values = c(cbbPalette[[3]], cbbPalette[[4]]), name = "", labels = c("Ambassador", "Wheaton")) +
+  theme_classic()
+
+plot3
+```
+
+
+```{r}
+plot4 <- ggplot(myco_data, aes(x = Treatment, y = MassperSeed_mg, fill = Cultivar)) +
+  geom_boxplot(position = position_dodge(), color = "black") +
+  geom_point(position = position_jitterdodge(), alpha = 0.6, color = "black", pch = 21) +
+  xlab("") +
+  ylab("Seed Mass (mg)") +
+  facet_wrap(~Cultivar, scales = "free") + 
+  scale_fill_manual(values = c(cbbPalette[[3]], cbbPalette[[4]]), name = "", labels = c("Ambassador", "Wheaton")) +
+  theme_classic()
+
+plot4
+```
+
+4.
+
+```{r}
+ Figure1 <- ggarrange(
+  plot2,  # First plot
+  plot3,  # Second plot
+  plot4,  # Third plot
+  labels = "AUTO",  # Automatically label the plots (A, B, C, etc.)
+  nrow = 1,  # Arrange the plots in 3 rows
+  ncol = 3,  # Arrange the plots in 1 column
+  common.legend = TRUE  # Do not include a legend in the combined figure
+)
+
+Figure1
+```
+
+
+5. 
+```{r}
+plot5 <- plot2 + 
+  geom_pwc(aes(group = Treatment), method = "t_test", label = "{p.adj.format}{p.adj.signif}")
+
+plot5
+```
+
+
+```{r}
+plot6 <- plot3 + 
+  geom_pwc(aes(group = Treatment), method = "t_test", label = "{p.adj.format}{p.adj.signif}")
+
+plot6
+```
+
+
+```{r}
+plot7 <- plot4 + 
+  geom_pwc(aes(group = Treatment), method = "t_test", label = "{p.adj.format}{p.adj.signif}")
+
+plot7
+```
+
+
+```{r}
+Figure2 <- ggarrange(
+  plot5,  # First plot
+  plot6,  # Second plot
+  plot7,  # Third plot
+  labels = "AUTO",  # Automatically label the plots (A, B, C, etc.)
+  nrow = 1,  # Arrange the plots in 3 rows
+  ncol = 3,  # Arrange the plots in 1 column
+  common.legend = TRUE  # Do not include a legend in the combined figure
+)
+
+Figure2
+```
+
+
+
+
+
+
+
+
