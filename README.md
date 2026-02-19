@@ -20,6 +20,7 @@ a.	A clickable link in your README to your GitHub flavored .md file
 
 b.	A file tree of your GitHub repository. 
 
+```
 ├── Assignment_DataReproducibility.Rproj
 ├── Assignments
 │   ├── Assignment 2.docx
@@ -58,7 +59,7 @@ b.	A file tree of your GitHub repository.
 ├── RmarkdownTutorial.Rmd
 ├── RmarkdownTutorial.html
 └── RmarkdownTutorial.md
-
+```
 
 
 ## Question No 6
