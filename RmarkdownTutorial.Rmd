@@ -1,0 +1,51 @@
+---
+title: "R Markdown Tutorial"
+author: "Somraj Shrestha"
+output:
+md_document:
+  variant: gfm
+  html_document:
+---
+This is an example R code
+```{r}
+summary(mtcars)
+```
+
+This is how to include figures
+```{r}
+library(ggplot2)
+ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point()
+```
+
+R markdown formatting option
+
+#First level header
+*this text is italics*
+**this text is bold**
+
+1. one item
+2. another item
+   - subitem
+   
+##Links
+
+  [Link to my github]()
+
+##Images
+
+![Image]()
+
+
+###Formatted tables
+```{r}
+library(knitr)
+kable(mtcars, digit = 3, format = "markdown")
+```
+
+###Generating file tree
+```{r}
+library(fs)
+fs::dir_tree()
+```
+
