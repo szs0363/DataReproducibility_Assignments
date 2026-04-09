@@ -1,0 +1,297 @@
+---
+title: "BonusAssignment"
+author: "Somraj Shrestha"
+date: "2026-04-09"
+output: html_document
+---
+
+# 1. Give me notes on the recap material. These questions focus on material that students commonly struggle with (data wrangling, plotting, modeling, or debugging).
+
+# Basic concept and codes on data wrangling
+
+-It is the process of cleaning, transforming, and reshaping data into analysis ready format.
+
+Key packages are dlpyr and tidyr.
+
+# FILTER - subset rows
+df %>% filter()
+
+# SELECT - choose columns
+df %>% select()
+
+
+# MUTATE - create/modify columns
+df %>% mutate()
+
+# ARRANGE - sort rows
+df %>% arrange()
+
+# GROUP_BY + SUMMARISE - aggregate data
+df %>% 
+  group_by() %>% 
+  summarise(),
+    n_samples = n(),
+    x = sd(y)
+  )
+
+# WIDE to LONG
+wide_data %>% 
+  pivot_longer(cols = c(day1, day2, day3),
+               names_to = "x",
+               values_to = "y")
+
+# LONG to WIDE
+long_data %>% 
+  pivot_wider(names_from = x,
+              values_from = y)
+
+# Concepts on ggplot
+gglot is created on layers and + adds new layer to the plot. 
+
+dataframe (data), aesthetic mapping (x and y variables, shape, color etc.), and a geom (the type of plot) are three things need to create a ggplot.
+
+Faceting helps spliting the plots into small panels based on categorical variable thus, allowing us to compare between the groups within a dataframe.
+
+Alpha adds transparency.
+
+# Modelling
+# Simple linear regression
+model1 <- lm(y ~ x, data = df)
+
+# Multiple regression
+model2 <- lm(y ~ x1 + x2 + x3, data = df)
+
+# With interactions
+model3 <- lm(y ~ x1 * x2, data = df)
+
+summary(model1) #to get the summary like p-value, beta and intercept.
+anova(model1, model2) #compare the models to identify best fitted models.
+
+# 2. Complete one of the extra optional materials provided, OR explore a topic of your choice, or find a topic online and explore the code and how it works.
+Write a short justification (2–3 sentences):
+Why did you choose this? What did you want to learn?
+
+-PopGenome was chosen because I will use it for my data analysis. The analysis reveals quantitative measures of genetic differentiation between heat-tolerant and less-tolerant fungal populations, allowing identification of high-FST outlier loci that may be under divergent selection for thermal adaptation. This approach provides both genome-wide population structure insights and pinpoints specific genomic regions potentially associated with heat tolerance traits
+
+# ============================================================================
+# PCA ANALYSIS FOR POPULATION STRUCTURE USING SNPRelate
+# ============================================================================
+
+# Load required libraries
+library(SNPRelate)
+library(gdsfmt)
+library(ggplot2)
+library(dplyr)
+library(RColorBrewer)
+
+# ============================================================================
+# STEP 1: DATA PREPARATION AND CONVERSION
+# ============================================================================
+
+# Convert VCF to GDS format (required for SNPRelate)
+# Replace "your_file.vcf" with your actual VCF file path
+vcf_file <- "your_file.vcf"
+gds_file <- "genome_data.gds"
+
+# Convert VCF to GDS format
+snpgdsVCF2GDS(vcf_file, gds_file, method="biallelic.only")
+
+# Open GDS file
+genofile <- snpgdsOpen(gds_file)
+
+# ============================================================================
+# STEP 2: DATA EXPLORATION
+# ============================================================================
+
+# Get basic information about the dataset
+cat("Dataset Summary:\n")
+cat("Total samples:", length(read.gdsn(index.gdsn(genofile, "sample.id"))), "\n")
+cat("Total SNPs:", length(read.gdsn(index.gdsn(genofile, "snp.id"))), "\n")
+
+# Get sample IDs
+sample_ids <- read.gdsn(index.gdsn(genofile, "sample.id"))
+print(head(sample_ids))
+
+# ============================================================================
+# STEP 3: DEFINE POPULATION GROUPS
+# ============================================================================
+
+# Define your sample groups based on heat tolerance
+# Adjust these according to your actual sample naming/ordering
+heat_tolerant_samples <- sample_ids[1:12]    # First 12 samples
+less_tolerant_samples <- sample_ids[13:35]   # Next 23 samples
+
+# Create population vector
+population <- rep(NA, length(sample_ids))
+population[sample_ids %in% heat_tolerant_samples] <- "Heat_Tolerant"
+population[sample_ids %in% less_tolerant_samples] <- "Less_Tolerant"
+
+# Create a sample information dataframe
+sample_info <- data.frame(
+  Sample_ID = sample_ids,
+  Population = population,
+  stringsAsFactors = FALSE
+)
+
+# Check population assignment
+table(sample_info$Population, useNA = "ifany")
+
+# ============================================================================
+# STEP 4: QUALITY CONTROL AND SNP FILTERING
+# ============================================================================
+
+# Optional: Filter SNPs based on missing rate and MAF
+# Remove SNPs with >10% missing data and MAF < 0.05
+snp_filtered <- snpgdsSelectSNP(genofile, 
+                               missing.rate = 0.1,     # Max 10% missing
+                               maf = 0.05,              # Min 5% minor allele frequency
+                               autosome.only = FALSE)   # Include all chromosomes
+
+cat("SNPs after filtering:", length(snp_filtered), "\n")
+
+# ============================================================================
+# STEP 5: PERFORM PCA ANALYSIS
+# ============================================================================
+
+# Run PCA analysis
+pca_result <- snpgdsPCA(genofile, 
+                       snp.id = snp_filtered,        # Use filtered SNPs
+                       num.thread = 2,               # Number of CPU cores
+                       autosome.only = FALSE)        # Include all chromosomes
+
+# Extract variance explained by each PC
+var_explained <- pca_result$varprop * 100  # Convert to percentage
+cat("Variance explained by first 5 PCs:\n")
+for(i in 1:5) {
+  cat("PC", i, ":", round(var_explained[i], 2), "%\n")
+}
+
+# ============================================================================
+# STEP 6: PREPARE DATA FOR VISUALIZATION
+# ============================================================================
+
+# Create PCA dataframe for plotting
+pca_data <- data.frame(
+  Sample_ID = pca_result$sample.id,
+  PC1 = pca_result$eigenvect[,1],
+  PC2 = pca_result$eigenvect[,2],
+  PC3 = pca_result$eigenvect[,3],
+  PC4 = pca_result$eigenvect[,4],
+  stringsAsFactors = FALSE
+)
+
+# Merge with population information
+pca_data <- merge(pca_data, sample_info, by = "Sample_ID")
+
+# ============================================================================
+# STEP 7: VISUALIZATION
+# ============================================================================
+
+# Define colors for populations
+colors <- c("Heat_Tolerant" = "#E31A1C", "Less_Tolerant" = "#1F78B4")
+
+# Plot PC1 vs PC2
+p1 <- ggplot(pca_data, aes(x = PC1, y = PC2, color = Population)) +
+  geom_point(size = 3, alpha = 0.8) +
+  scale_color_manual(values = colors) +
+  theme_minimal() +
+  theme(
+    legend.position = "top",
+    plot.title = element_text(hjust = 0.5),
+    panel.grid.minor = element_blank()
+  ) +
+  labs(
+    title = "Principal Component Analysis (PC1 vs PC2)",
+    subtitle = paste0("Heat-tolerant (n=12) vs Less-tolerant (n=23) genomes"),
+    x = paste0("PC1 (", round(var_explained[1], 1), "% variance)"),
+    y = paste0("PC2 (", round(var_explained[2], 1), "% variance)"),
+    color = "Heat Tolerance"
+  )
+
+print(p1)
+
+# Plot PC1 vs PC3
+p2 <- ggplot(pca_data, aes(x = PC1, y = PC3, color = Population)) +
+  geom_point(size = 3, alpha = 0.8) +
+  scale_color_manual(values = colors) +
+  theme_minimal() +
+  theme(
+    legend.position = "top",
+    plot.title = element_text(hjust = 0.5),
+    panel.grid.minor = element_blank()
+  ) +
+  labs(
+    title = "Principal Component Analysis (PC1 vs PC3)",
+    x = paste0("PC1 (", round(var_explained[1], 1), "% variance)"),
+    y = paste0("PC3 (", round(var_explained[3], 1), "% variance)"),
+    color = "Heat Tolerance"
+  )
+
+print(p2)
+
+# Scree plot - variance explained by each PC
+scree_data <- data.frame(
+  PC = 1:10,
+  Variance = var_explained[1:10]
+)
+
+p3 <- ggplot(scree_data, aes(x = PC, y = Variance)) +
+  geom_line(color = "blue", size = 1) +
+  geom_point(color = "blue", size = 2) +
+  theme_minimal() +
+  labs(
+    title = "Scree Plot - Variance Explained by Principal Components",
+    x = "Principal Component",
+    y = "Variance Explained (%)"
+  ) +
+  scale_x_continuous(breaks = 1:10)
+
+print(p3)
+
+# ============================================================================
+# STEP 8: CALCULATE GENETIC DISTANCES AND CLUSTERING
+# ============================================================================
+
+# Calculate pairwise genetic distances
+dist_matrix <- snpgdsDiss(genofile, 
+                         snp.id = snp_filtered,
+                         autosome.only = FALSE)
+
+# Perform hierarchical clustering
+hclust_result <- hclust(as.dist(dist_matrix$diss), method = "ward.D2")
+
+# Plot dendrogram
+plot(hclust_result, 
+     labels = sample_info$Population[match(hclust_result$labels, sample_info$Sample_ID)],
+     main = "Hierarchical Clustering Based on Genetic Distance",
+     xlab = "Samples", ylab = "Distance",
+     cex = 0.8)
+
+
+
+
+# 3. Introduction to renv.
+
+RENV is a package management package. It makes a file relative to the R project. It saves it in a lockfile. Lockfile will help to load all the package and the current versions.
+
+library(ggplot2)
+library(dplyr)
+install.packages(“renv”)
+
+#On the console. 
+#accesses all the functions within a package.
+renv::init()
+
+Check activate.R within the renv file created.
+
+.libPaths()
+#tells you where the packages are installed.
+
+renv::snapshot() #It's like the save button.
+
+Renv::restore(). #install all the packages in the lockfile.
+
+
+
+
+
